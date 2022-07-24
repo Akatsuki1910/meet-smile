@@ -46,9 +46,12 @@ function main() {
 
       node?.querySelector('#toggle')?.addEventListener(
         'input',
-        (evt: any) => {
-          evt.target.classList.toggle('on', !!~~evt.target.value)
-          mask_btn = evt.target.value
+        (evt: Event) => {
+          if (evt) {
+            const tar = evt.target as HTMLInputElement
+            tar.classList.toggle('on', !!~~tar.value)
+            mask_btn = tar.value
+          }
         },
         false,
       )
@@ -77,8 +80,6 @@ function main() {
   function _modifiedGetUserMedia(
     constraints: MediaStreamConstraints | undefined,
   ): any {
-    const select = document.getElementById('video_type')
-
     // --- video constraints ---
     const withVideo = !!constraints?.video
     if (constraints?.video) {
