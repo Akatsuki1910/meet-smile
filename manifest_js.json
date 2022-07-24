@@ -1,0 +1,21 @@
+{
+  "name": "meet-smile",
+  "description": "meet-smile",
+  "version": "1.0",
+  "manifest_version": 3,
+  "host_permissions": ["https://meet.google.com/"],
+  "content_scripts": [
+    {
+      "js": ["test/index.js"],
+      "matches": ["https://meet.google.com/*"],
+      "run_at": "document_start",
+      "css": ["test/style.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["test/index2.js", "test/baseImg.js"],
+      "matches": ["https://meet.google.com/*"]
+    }
+  ]
+}
