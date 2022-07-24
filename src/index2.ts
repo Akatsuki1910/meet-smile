@@ -200,7 +200,7 @@ function main() {
 
   function _updateCanvas() {
     try {
-      _drawCanvas(canvas)
+      _drawCanvas()
     } catch (err) {
       console.error('draw ERR:' + err)
     }
@@ -210,14 +210,12 @@ function main() {
     }
   }
 
-  function _drawCanvas(canvas: HTMLCanvasElement) {
+  function _drawCanvas() {
     //facemeshで顔検出
     _face_model
       ?.estimateFaces(video)
       .then((predictions: facemesh.AnnotatedPrediction[]) => {
         const ctx = canvasCtx
-        const width = canvas.width
-        const height = canvas.height
         ctx?.drawImage(video, 0, 0)
 
         //顔が検出されていればマスク用画像合成
