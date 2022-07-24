@@ -79,7 +79,7 @@ function main() {
 
   function _modifiedGetUserMedia(
     constraints: MediaStreamConstraints | undefined,
-  ): any {
+  ): Promise<MediaStream> {
     // --- video constraints ---
     const withVideo = !!constraints?.video
     if (constraints?.video) {
@@ -90,34 +90,36 @@ function main() {
     if (mask_btn === '1') {
       return _startStream(withVideo, withAudio, constraints)
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return navigator.mediaDevices._getUserMedia!(constraints)
     }
   }
 
-  function _setupCanvasSize(constraints: any) {
-    if (constraints.video?.advanced) {
-      constraints.video?.advanced.forEach(
-        (item: { width: { min: number }; height: { min: number } }) => {
-          if (item.width?.min) {
-            canvas.width = item.width.min
-          }
-          if (item.height?.min) {
-            canvas.height = item.height.min
-          }
-        },
-      )
+  function _setupCanvasSize(constraints: MediaStreamConstraints) {
+    const vid = constraints.video as MediaTrackConstraints
+    const adv = vid.advanced
+    if (adv) {
+      adv.forEach((item: any) => {
+        console.log(item, item.width)
+        if (item.width?.min) {
+          canvas.width = item.width.min
+        }
+        if (item.height?.min) {
+          canvas.height = item.height.min
+        }
+      })
       video.width = canvas.width
       video.height = canvas.height
 
       return
     }
 
-    if (constraints.video?.width) {
-      canvas.width = constraints.video.width
+    if (vid.width) {
+      canvas.width = vid.width as number
     }
 
-    if (constraints.video?.height) {
-      canvas.height = constraints.video.height
+    if (vid.height) {
+      canvas.height = vid.height as number
     }
 
     video.width = canvas.width
@@ -135,7 +137,7 @@ function main() {
     withVideo: boolean,
     withAudio: boolean,
     constraints: any,
-  ) {
+  ): Promise<MediaStream> {
     return new Promise((resolve, reject) => {
       if (!withVideo) {
         // NEED video
@@ -143,6 +145,7 @@ function main() {
       }
 
       // まずはデバイスの映像を取得する（指定されていれば音声も）
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       navigator.mediaDevices._getUserMedia!(constraints)
         .then(async (stream: any) => {
           video.srcObject = stream
