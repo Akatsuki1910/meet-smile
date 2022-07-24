@@ -16,8 +16,6 @@ declare global {
 
 function main() {
   'use strict'
-  const PRINT_DEBUG_LOG = true
-
   if (navigator.mediaDevices._getUserMedia !== undefined) return
   const video = document.createElement('video')
   const canvas = document.createElement('canvas')
@@ -51,7 +49,6 @@ function main() {
         (evt: any) => {
           evt.target.classList.toggle('on', !!~~evt.target.value)
           mask_btn = evt.target.value
-          _debuglog('mask_btn=' + mask_btn)
         },
         false,
       )
@@ -70,13 +67,6 @@ function main() {
     navigator.mediaDevices.getUserMedia = _modifiedGetUserMedia
   }
 
-  function _debuglog(var_args: string) {
-    if (PRINT_DEBUG_LOG) {
-      // eslint-disable-next-line prefer-rest-params
-      console.log(...arguments)
-    }
-  }
-
   function _clearCanvas() {
     if (canvasCtx) {
       canvasCtx.fillStyle = 'rgb(255,255,255)'
@@ -87,7 +77,6 @@ function main() {
   function _modifiedGetUserMedia(
     constraints: MediaStreamConstraints | undefined,
   ): any {
-    console.log('getusermedia')
     const select = document.getElementById('video_type')
 
     // --- video constraints ---
@@ -139,7 +128,6 @@ function main() {
   async function _face_loadModel() {
     const model = await facemesh.load()
     _face_model = model
-    _debuglog('_face_model = ' + _face_model)
   }
 
   function _startStream(
@@ -154,11 +142,8 @@ function main() {
       }
 
       // まずはデバイスの映像を取得する（指定されていれば音声も）
-      console.log('video')
       navigator.mediaDevices._getUserMedia!(constraints)
         .then(async (stream: any) => {
-          console.log(stream)
-
           video.srcObject = stream
           video.onloadedmetadata = () => {
             video.width = video.videoWidth
@@ -170,7 +155,6 @@ function main() {
           video.volume = 0.0
 
           // Canvasを更新する処理をrequestAnimationFrame()で呼び出す
-          console.log('canvas')
           _clearCanvas()
           requestAnimationFrame(_updateCanvas)
           // Canvasから映像ストリームを取り出す
@@ -199,7 +183,7 @@ function main() {
             if (audioTrack) {
               canvasStream.addTrack(audioTrack)
             } else {
-              _debuglog('WARN: NO audio in device stream')
+              console.warn('WARN: NO audio in device stream')
             }
           }
 
@@ -215,7 +199,7 @@ function main() {
     try {
       _drawCanvas(canvas)
     } catch (err) {
-      _debuglog('draw ERR:' + err)
+      console.error('draw ERR:' + err)
     }
 
     if (keepAnimation) {
