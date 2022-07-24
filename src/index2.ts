@@ -100,7 +100,6 @@ function main() {
     const adv = vid.advanced
     if (adv) {
       adv.forEach((item: any) => {
-        console.log(item, item.width)
         if (item.width?.min) {
           canvas.width = item.width.min
         }
@@ -136,7 +135,7 @@ function main() {
   function _startStream(
     withVideo: boolean,
     withAudio: boolean,
-    constraints: any,
+    constraints: MediaStreamConstraints | undefined,
   ): Promise<MediaStream> {
     return new Promise((resolve, reject) => {
       if (!withVideo) {
@@ -147,7 +146,7 @@ function main() {
       // まずはデバイスの映像を取得する（指定されていれば音声も）
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       navigator.mediaDevices._getUserMedia!(constraints)
-        .then(async (stream: any) => {
+        .then(async (stream: MediaStream) => {
           video.srcObject = stream
           video.onloadedmetadata = () => {
             video.width = video.videoWidth
@@ -193,7 +192,7 @@ function main() {
 
           resolve(canvasStream)
         })
-        .catch((err: any) => {
+        .catch((err: unknown) => {
           reject(err)
         })
     })
@@ -213,9 +212,9 @@ function main() {
 
   function _drawCanvas(canvas: HTMLCanvasElement) {
     //facemeshで顔検出
-    _face_model!
-      .estimateFaces(video)
-      .then((predictions: string | any[]) => {
+    _face_model
+      ?.estimateFaces(video)
+      .then((predictions: facemesh.AnnotatedPrediction[]) => {
         const ctx = canvasCtx
         const width = canvas.width
         const height = canvas.height
@@ -226,28 +225,25 @@ function main() {
           const expansion = 1.8
           const x_margin = -40.0
           const y_margin = -40.0
-          const x = predictions[0].boundingBox.topLeft[0] + x_margin
-          const y = predictions[0].boundingBox.topLeft[1] + y_margin
-          const i_width =
-            (predictions[0].boundingBox.bottomRight[0] -
-              predictions[0].boundingBox.topLeft[0]) *
-            expansion
+          const tl = predictions[0].boundingBox.topLeft as number[]
+          const br = predictions[0].boundingBox.bottomRight as number[]
+          const x = tl[0] + x_margin
+          const y = tl[1] + y_margin
+          const i_width = (br[0] - tl[0]) * expansion
           const i_height = (825 * i_width) / 900
           ctx?.drawImage(nicoImg, x, y, i_width, i_height)
         }
       })
-      .catch((err: any) => {
+      .catch((err: unknown) => {
         console.error('estimateFaces ERROR:', err)
       })
   }
 
-  // create GUI
   const insertPoint = document.getElementsByTagName('body')[0]
   _insertGUI(insertPoint)
 
   _replaceGetUserMedia()
 
-  // load facemesh
   setTimeout(_face_loadModel, 1000)
 }
 main()
