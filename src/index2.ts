@@ -99,6 +99,7 @@ function main() {
     const vid = constraints.video as MediaTrackConstraints
     const adv = vid.advanced
     if (adv) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       adv.forEach((item: any) => {
         if (item.width?.min) {
           canvas.width = item.width.min
