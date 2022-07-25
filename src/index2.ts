@@ -18,6 +18,7 @@ const video = document.createElement('video')
 const canvas = document.createElement('canvas')
 let canvasCtx: CanvasRenderingContext2D | null
 let keepAnimation = false
+let mask_btn = '0'
 
 function createDom() {
   canvas.width = 640
@@ -25,7 +26,6 @@ function createDom() {
   canvasCtx = canvas.getContext('2d')
 }
 
-let mask_btn = '0'
 function createGUI(node: HTMLBodyElement) {
   try {
     const d = document.createElement('div')
@@ -53,7 +53,7 @@ function createGUI(node: HTMLBodyElement) {
       false,
     )
   } catch (e) {
-    console.error('_insertGUI() ERROR:', e)
+    console.error('ERROR:', e)
   }
 }
 
@@ -70,7 +70,6 @@ function replaceGetUserMedia() {
 function _modifiedGetUserMedia(
   constraints: MediaStreamConstraints | undefined,
 ): Promise<MediaStream> {
-  // --- video constraints ---
   const withVideo = !!constraints?.video
   if (constraints?.video) {
     _setupCanvasSize(constraints)
@@ -158,13 +157,12 @@ function _startStream(
           videoTrack.stop = function () {
             keepAnimation = false
             videoTrack._stop()
-            stream?.getTracks().forEach((track: { stop: () => void }) => {
-              track.stop()
-            })
+            stream
+              .getTracks()
+              .forEach((track: MediaStreamTrack) => track.stop())
           }
         }
 
-        // --- for audio ---
         if (withAudio) {
           const audioTrack = stream.getAudioTracks()[0]
           if (audioTrack) {
@@ -217,7 +215,7 @@ function _drawCanvas() {
       }
     })
     .catch((err: unknown) => {
-      console.error('estimateFaces ERROR:', err)
+      console.error('ERROR:', err)
     })
 }
 
@@ -228,7 +226,6 @@ function _clearCanvas() {
   }
 }
 
-//------ facemesh ------
 let _face_model: facemesh.FaceMesh | null = null
 async function _face_loadModel() {
   const model = await facemesh.load()
