@@ -205,8 +205,8 @@ function _drawCanvas() {
       //顔が検出されていればマスク用画像合成
       if (predictions.length !== 0) {
         const expansion = 1.8
-        const x_margin = -40.0
-        const y_margin = -40.0
+        const x_margin = -60.0
+        const y_margin = -60.0
         const tl = predictions[0].boundingBox.topLeft as number[]
         const br = predictions[0].boundingBox.bottomRight as number[]
         const x = tl[0] + x_margin
