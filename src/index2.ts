@@ -32,12 +32,12 @@ function main() {
   function _insertGUI(node: HTMLBodyElement) {
     try {
       const d = document.createElement('div')
-      d.style.cssText =
-        'border: 1px solid blue; position: absolute; top: 0; z-index: 2001; background-color: rgba(192, 250, 192, 0.7);'
+      d.style.cssText = 'position: absolute; top: 0; z-index: 2001;'
       const inp = document.createElement('input')
       inp.type = 'range'
       inp.id = 'toggle'
       inp.className = 'onoff'
+      inp.step = '1'
       inp.min = '0'
       inp.max = '1'
       inp.value = '0'
