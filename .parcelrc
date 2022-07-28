@@ -1,3 +1,7 @@
 {
-  "extends": "@parcel/config-webextension"
+  "extends": ["@parcel/config-default", "@parcel/config-webextension"],
+  "resolvers": ["@parcel/resolver-glob", "..."],
+  "transformers": {
+    "*.png": ["@parcel/transformer-image"]
+  }
 }

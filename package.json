@@ -9,6 +9,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@parcel/config-default": "^2.6.2",
+    "@parcel/resolver-glob": "^2.6.2",
+    "@parcel/transformer-image": "^2.6.2",
     "@tensorflow-models/face-landmarks-detection": "^1.0.1",
     "@tensorflow-models/facemesh": "^0.0.5",
     "@tensorflow/tfjs": "^3.19.0"

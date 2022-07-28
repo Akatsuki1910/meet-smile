@@ -14,7 +14,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["src/index2.ts", "src/baseImg.ts"],
+      "resources": ["src/meet.ts", "src/baseImg.ts", "src/img/*.ts"],
       "matches": ["https://meet.google.com/*"]
     }
   ]

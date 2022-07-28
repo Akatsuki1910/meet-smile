@@ -1,6 +1,6 @@
 import '@tensorflow/tfjs'
 import * as facemesh from '@tensorflow-models/facemesh'
-import { nicoImg } from './baseImg'
+import faceImg from './baseImg'
 
 declare global {
   interface MediaStreamTrack {
@@ -19,6 +19,7 @@ const canvas = document.createElement('canvas')
 let canvasCtx: CanvasRenderingContext2D | null
 let keepAnimation = false
 let mask_btn = '0'
+let faceImgData: HTMLImageElement
 
 function createDom() {
   canvas.width = 640
@@ -28,26 +29,31 @@ function createDom() {
 
 function createGUI(node: HTMLBodyElement) {
   try {
-    const d = document.createElement('div')
+    const d = document.createElement('select')
     d.style.cssText = 'position: absolute; top: 0; z-index: 2001;'
-    const inp = document.createElement('input')
-    inp.type = 'range'
-    inp.id = 'toggle'
-    inp.className = 'onoff'
-    inp.step = '1'
-    inp.min = '0'
-    inp.max = '1'
-    inp.value = '0'
-    d.appendChild(inp)
+    d.id = 'toggle'
+    const faceImgName = ['none', 'aktk', 'smile']
+    faceImgName.forEach((f, i) => {
+      const inp = document.createElement('option')
+      inp.text = f
+      inp.value = String(i)
+      d.appendChild(inp)
+    })
+
     node.appendChild(d)
 
     node?.querySelector('#toggle')?.addEventListener(
-      'input',
-      (evt: Event) => {
+      'change',
+      (evt) => {
         if (evt) {
-          const tar = evt.target as HTMLInputElement
-          tar.classList.toggle('on', !!~~tar.value)
-          mask_btn = tar.value
+          const tar = evt.target as HTMLSelectElement
+          const ind = ~~tar.selectedIndex
+          const flg = !!ind
+          tar.classList.toggle('on', flg)
+          mask_btn = String(ind)
+          if (flg) {
+            faceImgData = faceImg[ind - 1]
+          }
         }
       },
       false,
@@ -76,7 +82,7 @@ function _modifiedGetUserMedia(
   }
 
   const withAudio = !!constraints?.audio
-  if (mask_btn === '1') {
+  if (mask_btn !== '0') {
     return _startStream(withVideo, withAudio, constraints)
   } else {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -202,16 +208,14 @@ function _drawCanvas() {
 
       //顔が検出されていればマスク用画像合成
       if (predictions.length !== 0) {
-        const expansion = 1.8
-        const x_margin = -60.0
-        const y_margin = -60.0
+        const expansion = faceImgData.width / 1000 + 1
         const tl = predictions[0].boundingBox.topLeft as number[]
         const br = predictions[0].boundingBox.bottomRight as number[]
-        const x = tl[0] + x_margin
-        const y = tl[1] + y_margin
         const i_width = (br[0] - tl[0]) * expansion
-        const i_height = (825 * i_width) / 900
-        ctx?.drawImage(nicoImg, x, y, i_width, i_height)
+        const i_height = (faceImgData.height * i_width) / faceImgData.width
+        const x = tl[0] + (br[0] - tl[0] - i_width) / 2
+        const y = tl[1] + (br[1] - tl[1] - i_height) / 2 - 50
+        ctx?.drawImage(faceImgData, x, y, i_width, i_height)
       }
     })
     .catch((err: unknown) => {
