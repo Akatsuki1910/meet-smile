@@ -32,7 +32,7 @@ function createGUI(node: HTMLBodyElement) {
     const d = document.createElement('select')
     d.style.cssText = 'position: absolute; top: 0; z-index: 2001;'
     d.id = 'toggle'
-    const faceImgName = ['none', 'aktk', 'smile', 'minto']
+    const faceImgName = ['none', 'aktk', 'smile', 'minto', 'oldman', 'hannya']
     faceImgName.forEach((f, i) => {
       const inp = document.createElement('option')
       inp.text = f
